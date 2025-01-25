@@ -84,6 +84,8 @@ function updateAtom<TValue>(atom: AnyAtom, newValue: TValue) {
     return
   }
 
+  // Writable derived atoms have their own update function
+  // Hence we know for a fact this atom is a readonly derived atom
   updateReadonlyDerivedAtom(atom)
 }
 
