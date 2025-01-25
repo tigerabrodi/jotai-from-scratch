@@ -163,6 +163,7 @@ export function useAtom<TValue>(
     if (atom.type === 'derived' && atom.write) {
       // If it's derived with write function, use that
       // From users' pov (get, set, {newValue}) => {}
+      // `set` is the updateAtom function
       atom.write(get, updateAtom, newValue)
     } else if (atom.type === 'primitive') {
       // If primitive, update directly
