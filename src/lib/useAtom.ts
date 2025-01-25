@@ -81,9 +81,10 @@ function getAtomValue<TValue>(atom: Atom<TValue>): TValue {
 function updateAtom<TValue>(atom: AnyAtom, newValue: TValue) {
   if (atom.type === 'primitive') {
     updatePrimitiveAtom(atom, newValue)
-  } else {
-    updateDerivedAtom(atom)
+    return
   }
+
+  updateReadonlyDerivedAtom(atom)
 }
 
 function updatePrimitiveAtom<TValue>(
@@ -100,15 +101,15 @@ function updatePrimitiveAtom<TValue>(
 
   dependentAtoms.forEach((dependentAtom) => {
     const castedDependentAtom = dependentAtom as AnyDerivedAtom
-    updateDerivedAtom(castedDependentAtom)
+    updateReadonlyDerivedAtom(castedDependentAtom)
   })
 }
 
 // We don't need to pass newValue here
 // Why?
-// Because derived atoms are computed by the read function
+// Because readonly derived atoms are computed by the read function
 // We'll end up calling getAtomValue(atom) again
-function updateDerivedAtom(atom: AnyDerivedAtom) {
+function updateReadonlyDerivedAtom(atom: AnyDerivedAtom) {
   subscriptions.get(atom)?.forEach((subscription) => subscription())
 
   const dependentAtoms = dependencies.get(atom)
@@ -116,7 +117,7 @@ function updateDerivedAtom(atom: AnyDerivedAtom) {
   if (!dependentAtoms) return
 
   dependentAtoms.forEach((dependentAtom) => {
-    updateDerivedAtom(dependentAtom as AnyDerivedAtom)
+    updateReadonlyDerivedAtom(dependentAtom as AnyDerivedAtom)
   })
 }
 
@@ -125,7 +126,6 @@ type SetValueFn<TValue> = (prev: TValue) => TValue
 export function useAtom<TValue>(
   atom: Atom<TValue>
 ): [TValue, (value: TValue | SetValueFn<TValue>) => void] {
-  // 1. Subscribe function for useSyncExternalStore
   const subscribe = (callback: () => void) => {
     // Add this component's callback to atom's subscriptions
     if (!subscriptions.has(atom)) {
@@ -141,7 +141,7 @@ export function useAtom<TValue>(
     }
   }
 
-  // Useful to know for ALL atoms
+  // Useful information to know for ALL atoms:
   // This is honestly more or less how useSyncExternalStore works
   // Every time we call subscription() e.g. subscriptions.get(atom)?.forEach((subscription) => subscription())
   // The component will be re-rendered ONLY if the previous snapshot is different from the current snapshot
