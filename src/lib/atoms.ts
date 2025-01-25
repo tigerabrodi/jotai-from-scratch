@@ -92,9 +92,6 @@ export function atom<TValue>(
     return {
       type: 'derived',
       read: configOrRead as ReadFn<TValue>,
-      // Write is optional
-      // Hence it's ok
-      // If not provided, it's a read-only derived atom!
       write,
     }
   }
