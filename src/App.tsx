@@ -28,7 +28,7 @@ const countAtom2 = atom(0)
 
 const doubledAtom = atom((get) => get(countAtom) * 2)
 
-const tripledAtom = atom((get) => get(doubledAtom) * 1.5) // depends on doubled!
+const tripledAtom = atom((get) => get(doubledAtom) * 1.5)
 
 function Counter() {
   const [count, setCount] = useAtom(countAtom)
