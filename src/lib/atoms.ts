@@ -22,7 +22,7 @@ export type ReadFn<TValue> = (get: Get) => TValue
 // We look at all its dependencies and make sure they're recomputed
 export type WriteFn<TValue> = (get: Get, set: Set, newValue: TValue) => void
 
-// Branded type so that we can use it for type inference
+// Branded type so that typescript knows what type of value each atom holds
 export type PrimitiveAtom<TValue> = {
   type: 'primitive'
   __brand: TValue
